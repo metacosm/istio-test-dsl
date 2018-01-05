@@ -40,7 +40,9 @@ public class IstioYamlGenerator {
                 .withWeight(100).build();
 
         RouteRule routeRule = new RouteRuleBuilder()
-                .withMetadata(new ObjectMetaBuilder().withGenerateName("my-rule").build())
+                .withNewMetadata()
+                .withGenerateName("my-rule")
+                .endMetadata()
                 .withNewDestination()
                 .withName("greeting-service")
                 .withNamespace("demo-istio") //optional
