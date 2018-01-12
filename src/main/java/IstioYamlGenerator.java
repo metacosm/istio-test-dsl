@@ -1,5 +1,8 @@
+import java.util.Optional;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import io.fabric8.kubernetes.api.model.KubernetesResourceList;
 import io.fabric8.kubernetes.api.model.apiextensions.CustomResourceDefinition;
@@ -7,9 +10,18 @@ import io.fabric8.kubernetes.client.Config;
 import io.fabric8.kubernetes.client.ConfigBuilder;
 import io.fabric8.openshift.client.DefaultOpenShiftClient;
 import io.fabric8.openshift.client.OpenShiftClient;
+import me.snowdrop.istio.api.internal.IstioDeserializer;
+import me.snowdrop.istio.api.model.DoneableIstioBaseResource;
+import me.snowdrop.istio.api.model.IstioBaseResource;
+import me.snowdrop.istio.api.model.IstioBaseResourceBuilder;
+import me.snowdrop.istio.api.model.IstioResource;
+import me.snowdrop.istio.api.model.v1.cexl.TypedValue;
+import me.snowdrop.istio.api.model.v1.mixer.config.descriptor.ValueType;
 import me.snowdrop.istio.api.model.v1.routing.DoneableRouteRule;
 import me.snowdrop.istio.api.model.v1.routing.RouteRule;
 import me.snowdrop.istio.api.model.v1.routing.RouteRuleBuilder;
+import me.snowdrop.istio.applier.IstioExecutor;
+import me.snowdrop.istio.applier.KubernetesAdapter;
 
 public class IstioYamlGenerator {
 
@@ -29,34 +41,31 @@ public class IstioYamlGenerator {
                 .build();
         OpenShiftClient client = new DefaultOpenShiftClient(config);
 
-        // retrieve the custom resource definition for RouteRules
-        final CustomResourceDefinition crd = client.customResourceDefinitions().withName("routerules.config.istio.io").get();
-
-        // create a YAML mapper for YAML output
-        ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
-        System.out.println("RouteRule CRD:");
-        System.out.println(mapper.writeValueAsString(crd));
+        KubernetesAdapter adapter = new KubernetesAdapter(client);
+        IstioExecutor executor = new IstioExecutor(adapter);
 
         // build a new RouteRule using fluent builder API
-        RouteRule routeRule = new RouteRuleBuilder()
+        final IstioBaseResource resource = new IstioBaseResourceBuilder()
                 .withNewMetadata()
-                .withGenerateName("my-rule") // generate name automatically
+                    .withGenerateName("my-rule") // generate name automatically
                 .endMetadata()
-                .withNewDestination()
-                .withName("greeting-service")
-                .withNamespace("demo-istio") //optional
-                .endDestination()
-                .addNewRoute()
-                .withWeight(100)
-                .endRoute()
+                .withNewRouteRuleSpec()
+                    .withNewDestination()
+                        .withName("greeting-service")
+                        .withNamespace("demo-istio") // optional
+                    .endDestination()
+                    .addNewRoute()
+                        .withWeight(100)
+                    .endRoute()
+                .endRouteRuleSpec()
                 .build();
 
         // create a new RouteRule resource
-        final RouteRule generated = client.customResource(crd, RouteRule.class, KubernetesResourceList.class, DoneableRouteRule.class)
-                .inNamespace("istio-system")
-                .create(routeRule);
+        final Optional<IstioResource> generated = executor.registerCustomResource(resource);
 
+        // create a YAML mapper for YAML output
+        ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
         System.out.println("Generated RouteRule:");
-        System.out.println(mapper.writeValueAsString(generated));
+        System.out.println(mapper.writeValueAsString(generated.get()));
     }
 }
