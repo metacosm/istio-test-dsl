@@ -9,8 +9,8 @@ import io.fabric8.openshift.client.DefaultOpenShiftClient;
 import io.fabric8.openshift.client.OpenShiftClient;
 import me.snowdrop.istio.api.model.IstioResource;
 import me.snowdrop.istio.api.model.IstioResourceBuilder;
-import me.snowdrop.istio.applier.IstioExecutor;
-import me.snowdrop.istio.applier.KubernetesAdapter;
+import me.snowdrop.istio.client.IstioClient;
+import me.snowdrop.istio.client.KubernetesAdapter;
 
 public class IstioYamlGenerator {
 
@@ -31,7 +31,7 @@ public class IstioYamlGenerator {
         OpenShiftClient client = new DefaultOpenShiftClient(config);
 
         KubernetesAdapter adapter = new KubernetesAdapter(client);
-        IstioExecutor executor = new IstioExecutor(adapter);
+        IstioClient executor = new IstioClient(adapter);
 
         // build a new RouteRule using fluent builder API
         final IstioResource resource = new IstioResourceBuilder()

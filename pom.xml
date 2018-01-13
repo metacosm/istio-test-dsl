@@ -34,12 +34,12 @@
         <dependency>
             <groupId>me.snowdrop</groupId>
             <artifactId>istio-model</artifactId>
-            <version>0.5-SNAPSHOT</version>
+            <version>0.5</version>
         </dependency>
         <dependency>
             <groupId>me.snowdrop</groupId>
-            <artifactId>istio-applier</artifactId>
-            <version>0.5-SNAPSHOT</version>
+            <artifactId>istio-client</artifactId>
+            <version>0.5</version>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
