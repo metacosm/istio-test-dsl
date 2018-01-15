@@ -27,6 +27,7 @@ public class IstioYamlGenerator {
                 .withMasterUrl(clusterURL)
                 .withUsername("admin")
                 .withPassword("admin")
+                .withNamespace("istio-system")
                 .build();
         OpenShiftClient client = new DefaultOpenShiftClient(config);
 
