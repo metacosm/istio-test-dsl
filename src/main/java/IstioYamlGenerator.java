@@ -1,12 +1,10 @@
-import java.util.Optional;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-import io.fabric8.kubernetes.client.Config;
-import io.fabric8.kubernetes.client.ConfigBuilder;
-import io.fabric8.openshift.client.DefaultOpenShiftClient;
-import io.fabric8.openshift.client.OpenShiftClient;
+import io.fabric8.kubernetes.clnt.v3_1.Config;
+import io.fabric8.kubernetes.clnt.v3_1.ConfigBuilder;
+import io.fabric8.openshift.clnt.v3_1.DefaultOpenShiftClient;
+import io.fabric8.openshift.clnt.v3_1.OpenShiftClient;
 import me.snowdrop.istio.api.model.IstioResource;
 import me.snowdrop.istio.api.model.IstioResourceBuilder;
 import me.snowdrop.istio.client.IstioClient;
@@ -51,11 +49,11 @@ public class IstioYamlGenerator {
                 .build();
 
         // create a new RouteRule resource
-        final Optional<IstioResource> generated = executor.registerCustomResource(resource);
+        final IstioResource generated = executor.registerCustomResource(resource);
 
         // create a YAML mapper for YAML output
         ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
         System.out.println("Generated RouteRule:");
-        System.out.println(mapper.writeValueAsString(generated.get()));
+        System.out.println(mapper.writeValueAsString(generated));
     }
 }
