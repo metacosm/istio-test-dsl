@@ -1,5 +1,3 @@
-import java.util.Optional;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
@@ -51,11 +49,11 @@ public class IstioYamlGenerator {
                 .build();
 
         // create a new RouteRule resource
-        final Optional<IstioResource> generated = executor.registerCustomResource(resource);
+        final IstioResource generated = executor.registerCustomResource(resource);
 
         // create a YAML mapper for YAML output
         ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
         System.out.println("Generated RouteRule:");
-        System.out.println(mapper.writeValueAsString(generated.get()));
+        System.out.println(mapper.writeValueAsString(generated));
     }
 }
