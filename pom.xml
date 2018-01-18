@@ -34,7 +34,7 @@
     <dependency>
       <groupId>me.snowdrop</groupId>
       <artifactId>istio-client-uberjar</artifactId>
-      <version>0.6-SNAPSHOT</version>
+      <version>0.6</version>
       <classifier>versioned</classifier>
     </dependency>
     <dependency>
